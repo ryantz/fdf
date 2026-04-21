@@ -6,21 +6,11 @@
 /*   By: ryatan <ryatan@student.42singapore.sg      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 20:57:20 by ryatan            #+#    #+#             */
-/*   Updated: 2025/12/02 22:00:44 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/04/21 12:21:00 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	len;
-
-	len = 0;
-	while (s[len] != '\0')
-		len++;
-	return (len);
-}
 
 void	ft_putchar(char c, int *count)
 {
