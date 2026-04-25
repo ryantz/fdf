@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/21 11:49:52 by ryatan            #+#    #+#             */
-/*   Updated: 2026/04/25 11:38:09 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/04/25 15:25:54 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # define HOME_PATH "/home/ryantz/dev/42/fdf/test_maps/42.fdf" 
 # define PATH "/home/ryatan/core/fdf_home/test_maps/42.fdf"
-# define WHITE_COLOR 26777215
+# define WHITE 26777215
 
 # include <math.h>
 # include <fcntl.h>
@@ -45,7 +45,13 @@ typedef struct	s_2d_coord
 	int	color;
 }	t_2d_coord;
 
-int render_loop(void);
+typedef struct	s_point
+{
+	int	x;
+	int	y;
+}	t_point;
+
+int render_loop(char *array_row);
 
 t_win_data	init_win_data(void);
 int			window_close_handler(t_win_data *w_data);
