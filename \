@@ -1,0 +1,48 @@
+#include "fdf.h"
+
+// pos_x pos_y is the starting points
+
+int	render_line(t_win_data *w_data, int pos_x, int pos_y);
+
+int render_loop(void)
+{
+	t_win_data	w_data;
+	int			start;
+	int			end;
+
+	start = 10;
+	end = 20;
+	w_data = init_win_data();
+	while (start < end)
+	{
+		render_line(&w_data, start, start);
+		start++;
+	}
+	window_loop(&w_data);
+	return (1);
+}
+
+// 0000  ----
+//       ||||
+// 0000  ----
+int	render_line(t_win_data *w_data, int pos_x, int pos_y)
+{
+	t_2d_coord	coord;
+	int			limit_x;
+	int			limit_y;
+
+	limit_x = pos_x + 10;
+	limit_y = pos_y + 10;
+	coord.x = pos_x;
+	coord.y = pos_y;
+	coord.color = WHITE_COLOR;
+	while (coord.x < limit_x && coord.y < limit_y)
+	{
+		mlx_pixel_put(w_data->mlx, w_data->win, coord.x, 10, coord.color);
+		mlx_pixel_put(w_data->mlx, w_data->win, 10, coord.y, coord.color);
+		coord.x++;
+		coord.y++;
+	}
+	
+	return (0);
+}

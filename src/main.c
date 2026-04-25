@@ -1,16 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/25 09:27:16 by ryatan            #+#    #+#             */
+/*   Updated: 2026/04/25 11:36:49 by ryatan           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
+
+// malloc used here
+// 700 x 700
+// 10 - 690 (68 points)
+
+
 
 int	main(void)
 {
-	int			line_count;
-	char		**map_2d_array;
-	t_win_data	w_data;
+	t_outer_array outer;
 
-	line_count = count_lines_in_map(HOME_PATH);
-	map_2d_array = malloc((line_count + 1) * sizeof(char *));
-	map_2d_array[line_count] = NULL;
-	map_2d_array = parse_map(HOME_PATH, line_count, &map_2d_array);
-	w_data = init_win_data();
-	window_loop(&w_data);
+	parse_map(HOME_PATH, &outer);
+	render_loop();
 	return (0);
 }

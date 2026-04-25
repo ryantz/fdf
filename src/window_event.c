@@ -2,7 +2,7 @@
 
 t_win_data	init_win_data(void)
 {
-	t_win_data w_data;
+	t_win_data	w_data;
 
 	w_data.mlx = mlx_init();
 	w_data.win = mlx_new_window(w_data.mlx, 700, 700, "ryatan's fdf");
