@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/21 11:49:52 by ryatan            #+#    #+#             */
-/*   Updated: 2026/04/25 15:25:54 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/04/27 21:44:39 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 # define HOME_PATH "/home/ryantz/dev/42/fdf/test_maps/42.fdf" 
 # define PATH "/home/ryatan/core/fdf_home/test_maps/42.fdf"
-# define WHITE 26777215
+# define WHITE 0xFFFFFF
+# define RED 0xFF0000
 
 # include <math.h>
 # include <fcntl.h>
@@ -38,24 +39,23 @@ typedef struct	s_win_data
 	void	*win;
 }	t_win_data;
 
-typedef struct	s_2d_coord
-{
-	int	x;
-	int	y;
-	int	color;
-}	t_2d_coord;
-
 typedef struct	s_point
 {
 	int	x;
 	int	y;
 }	t_point;
 
-int render_loop(char *array_row);
+typedef struct s_padding
+{
+	int	pad_start;
+	int	pad_end;
+}	t_padding;
+
+int			render_2d_grid(char **outer_array);
 
 t_win_data	init_win_data(void);
 int			window_close_handler(t_win_data *w_data);
 void		window_loop(t_win_data *w_data);
 
-char	**parse_map(char *map_file_path, t_outer_array *outer);
+char		**parse_map(char *map_file_path, t_outer_array *outer);
 #endif
