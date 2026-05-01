@@ -6,105 +6,87 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/26 22:17:18 by ryatan            #+#    #+#             */
-/*   Updated: 2026/04/27 21:43:54 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/01 14:34:38 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-int	draw_point(t_win_data *w_data, t_point *point, int y_coord_gap);
-int	render_x(char *array_row, t_win_data *w_data, t_point *point,
-		int y_coord_gap);
-int	draw_y_line(t_win_data *w_data, t_point *point, int y_coord_gap);
-int	draw_x_line(t_win_data *w_data, t_point *point, int x_coord_gap);
-
-int	render_2d_grid(char **outer_array)
+void	put_pixel(t_win_data *w_data, int x, int y, int color)
 {
-	t_win_data	w_data;
-	t_point		point;
-	int			i;
-	int			outer_array_len;
-	int			y_coord_gap;
+	char	*dst;
 
-	i = 0;
-	point.x = 10;
-	point.y = 10;
-	outer_array_len = 0;
-	w_data = init_win_data();
-	while (outer_array[outer_array_len])
-		outer_array_len++;
-	y_coord_gap = 680 / (outer_array_len - 1);
-	while (i < outer_array_len)
-	{
-		render_x(outer_array[i], &w_data, &point, y_coord_gap);
-		point.y += y_coord_gap;
-		ft_printf("point.y: %d\n", point.y);
-		point.x = 10;
-		i++;
-	}
-	window_loop(&w_data);
-	return (1);
+	if (x < 0 || x >= 700 || y < 0 || y >= 700)
+		return ;
+	dst = w_data->addr + (y * w_data->line_len + x * (w_data->bpp / 8));
+	*(unsigned int *)dst = color;
 }
 
-int	render_x(char *array_row, t_win_data *w_data, t_point *point,
-		int y_coord_gap)
+t_point	project(int x, int y, int z)
 {
-	char	**split_array;
-	int		split_array_len;
-	int		x_coord_gap;
-	int		i;
+	t_point	p;
 
-	split_array_len = 0;
-	split_array = ft_split(array_row, ' ');
-	while (split_array[split_array_len])
-		split_array_len++;
-	ft_printf("array_len: %d\n", split_array_len);
-	x_coord_gap = 680 / (split_array_len - 1);
-	i = 0;
-	while (i < split_array_len)
-	{
-		draw_point(w_data, point, y_coord_gap);
-		ft_printf("point %d drawn\n", i + 1);
-		draw_x_line(w_data, point, x_coord_gap);
-		point->x += x_coord_gap;
-		i++;
-	}
-	return (1);
+	p.x = (int)((x - y) * cos(0.523599) * ISO_SCALE) + OFFSET_X;
+	p.y = (int)((x + y) * sin(0.524599) * ISO_SCALE - z * ISO_SCALE)
+		+ OFFSET_Y;
+	return (p);
 }
 
-int	draw_y_line(t_win_data *w_data, t_point *point, int y_coord_gap)
+void    bresenham(t_win_data *w, t_point p0, t_point p1, int color)
 {
-	int	start;
-	int	end;
+    int    dx;
+    int    dy;
+    int    sx;
+    int    sy;
+    int    err;
+    int    e2;
 
-	start = point->y + 1;
-	end = point->y + (y_coord_gap - 1);
-	while (start <= end && end < 700)
-	{
-		mlx_pixel_put(w_data->mlx, w_data->win, point->x, start, WHITE);
-		start++;
-	}
-	return (1);
+    dx = abs(p1.x - p0.x);
+    dy = -abs(p1.y - p0.y);
+    sx = p0.x < p1.x ? 1 : -1;   // step direction x
+    sy = p0.y < p1.y ? 1 : -1;   // step direction y
+    err = dx + dy;
+    while (1)
+    {
+        put_pixel(w, p0.x, p0.y, color);
+        if (p0.x == p1.x && p0.y == p1.y)
+            break ;
+        e2 = 2 * err;
+        if (e2 >= dy) { err += dy; p0.x += sx; }
+        if (e2 <= dx) { err += dx; p0.y += sy; }
+    }
 }
 
-int	draw_x_line(t_win_data *w_data, t_point *point, int x_coord_gap)
+void    render_iso(t_win_data *w, t_map *map)
 {
-	int	start;
-	int	end;
+    int        i;
+    int        j;
+    t_point    cur;
+    t_point    next;
 
-	start = point->x + 1;
-	end = point->x + (x_coord_gap - 1);
-	while (start <= end && end < 700)
-	{
-		mlx_pixel_put(w_data->mlx, w_data->win, start, point->y, WHITE);
-		start++;
-	}
-	return (1);
-}
+    i = 0;
+    while (i < map->rows)
+    {
+        j = 0;
+        while (j < map->cols)
+        {
+            cur = project(j, i, map->rows_array[i].array[j]);
 
-int	draw_point(t_win_data *w_data, t_point *point, int y_coord_gap)
-{
-	mlx_pixel_put(w_data->mlx, w_data->win, point->x, point->y, RED);
-	draw_y_line(w_data, point, y_coord_gap);
-	return (1);
+            // draw line to the right neighbour
+            if (j + 1 < map->cols)
+            {
+                next = project(j + 1, i, map->rows_array[i].array[j + 1]);
+                bresenham(w, cur, next, WHITE);
+            }
+            // draw line to the bottom neighbour
+            if (i + 1 < map->rows)
+            {
+                next = project(j, i + 1, map->rows_array[i + 1].array[j]);
+                bresenham(w, cur, next, WHITE);
+            }
+            j++;
+        }
+        i++;
+    }
+    mlx_put_image_to_window(w->mlx, w->win, w->img, 0, 0);
 }

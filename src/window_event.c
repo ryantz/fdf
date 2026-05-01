@@ -6,6 +6,9 @@ t_win_data	init_win_data(void)
 
 	w_data.mlx = mlx_init();
 	w_data.win = mlx_new_window(w_data.mlx, 700, 700, "ryatan's fdf");
+	w_data.img = mlx_new_image(w_data.mlx, 700, 700);
+	w_data.addr = mlx_get_data_addr(w_data.img, &w_data.bpp, &w_data.line_len,
+			&w_data.endian);
 	return (w_data);
 }
 
