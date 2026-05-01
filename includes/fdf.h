@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/21 11:49:52 by ryatan            #+#    #+#             */
-/*   Updated: 2026/04/27 21:44:39 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/01 14:18:33 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,6 @@
 # include "mlx_int.h"
 # include "../get_next_line/get_next_line.h"
 
-typedef struct	s_outer_array
-{
-	char	**outer_array;
-	int		line_count;
-}	t_outer_array;
-
 typedef struct	s_win_data
 {
 	void	*mlx;
@@ -45,11 +39,30 @@ typedef struct	s_point
 	int	y;
 }	t_point;
 
-typedef struct s_padding
+typedef struct s_int_array
 {
-	int	pad_start;
-	int	pad_end;
-}	t_padding;
+	int	*array;
+	int	count;
+} t_int_array;
+
+typedef struct	s_map
+{
+	t_int_array *rows_array;
+	int	rows;
+	int	cols;
+}	t_map;
+
+typedef struct	s_outer_array
+{
+	char	**outer_array;
+	int		line_count;
+}	t_outer_array;
+
+void		free_all(char **array);
+void		print_map_3d(t_map *map);
+int			parse_map_3d(char **outer_array, t_map *map);
+
+int			split_rows(char *outer_array_row, t_int_array *z_array);
 
 int			render_2d_grid(char **outer_array);
 
@@ -57,5 +70,5 @@ t_win_data	init_win_data(void);
 int			window_close_handler(t_win_data *w_data);
 void		window_loop(t_win_data *w_data);
 
-char		**parse_map(char *map_file_path, t_outer_array *outer);
+char		**parse_map_2d(char *map_file_path, t_outer_array *outer);
 #endif

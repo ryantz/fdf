@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse_map.c                                        :+:      :+:    :+:   */
+/*   parse_map_2d.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/22 11:38:09 by ryatan            #+#    #+#             */
-/*   Updated: 2026/04/27 20:26:29 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/01 14:07:59 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	print_parsed_map(char **map, t_outer_array *outer)
 	}
 }
 
-char	**parse_map(char *map_file_path, t_outer_array *outer)
+char	**parse_map_2d(char *map_file_path, t_outer_array *outer)
 {
 	char	**array;
 
@@ -90,7 +90,7 @@ t_outer_array	*create_array(char *map_file_path, t_outer_array *outer)
 	}
 	close(fd);
 	outer->outer_array = malloc((outer->line_count + 1) * sizeof(char *));
-	outer->outer_array[outer->line_count - 1] = NULL;
+	outer->outer_array[outer->line_count] = NULL;
 	return (outer);
 }
 

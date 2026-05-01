@@ -6,7 +6,7 @@
 #    By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/09 08:56:45 by ryatan            #+#    #+#              #
-#    Updated: 2026/04/25 00:03:18 by ryatan           ###   ########.fr        #
+#    Updated: 2026/05/01 08:40:17 by ryatan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,10 @@ OBJ_DIR = obj
 SRC_DIR = src
 
 SRC = ../get_next_line/get_next_line.c \
+	  helpers.c \
 	  rendering.c \
-	  parse_map.c \
+	  parse_map_2d.c \
+	  parse_map_3d.c \
 	  window_event.c \
 	  main.c \
 

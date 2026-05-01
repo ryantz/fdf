@@ -1,34 +1,47 @@
 #include "fdf.h"
 
 // 0xffffff
-char	*convert_string_to_lower(char **str);
+//char	*convert_string_to_lower(char **str);
+//
+//int	hex_to_dec(char *str)
+//{
+//	int	converted;
+//	int	i;
+//	char	*range;
+//
+//	range = "0123456789abcdef";
+//	convert_string_to_lower(&str);
+//	i = 2;
+//	while (str[i])
+//	{
+//		i++;
+//	}
+//	converted = 0;
+//	return (converted);
+//}
+//
+//char	*convert_string_to_lower(char **str)
+//{
+//	int	i;
+//
+//	i = 2;
+//	while (str[i])
+//	{
+//		ft_tolower(str[i]);
+//		i++;
+//	}
+//	return (str);
+//}
 
-int	hex_to_dec(char *str)
+void	free_all(char **array)
 {
-	int	converted;
 	int	i;
-	char	*range;
 
-	range = "0123456789abcdef";
-	convert_string_to_lower(&str);
-	i = 2;
-	while (str[i])
+	i = 0;
+	while (array[i])
 	{
+		free(array[i]);
 		i++;
 	}
-	converted = 0;
-	return (converted);
-}
-
-char	*convert_string_to_lower(char **str)
-{
-	int	i;
-
-	i = 2;
-	while (str[i])
-	{
-		ft_tolower(str[i]);
-		i++;
-	}
-	return (str);
+	free(array);
 }

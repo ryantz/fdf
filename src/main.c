@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 09:27:16 by ryatan            #+#    #+#             */
-/*   Updated: 2026/04/27 21:44:03 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/01 14:13:18 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,12 @@
 
 int	main(void)
 {
-	t_outer_array outer;
+	t_outer_array	outer;
+	t_map			map;
 
-	parse_map(HOME_PATH, &outer);
-	render_2d_grid(outer.outer_array);
+	parse_map_2d(HOME_PATH, &outer);
+	parse_map_3d(outer.outer_array, &map);
+	print_map_3d(&map);
+	free_all(outer.outer_array);
 	return (0);
 }
