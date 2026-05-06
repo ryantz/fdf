@@ -1,37 +1,38 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   helpers.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/06 20:00:59 by ryatan            #+#    #+#             */
+/*   Updated: 2026/05/06 20:40:49 by ryatan           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
 
-// 0xffffff
-//char	*convert_string_to_lower(char **str);
-//
-//int	hex_to_dec(char *str)
-//{
-//	int	converted;
-//	int	i;
-//	char	*range;
-//
-//	range = "0123456789abcdef";
-//	convert_string_to_lower(&str);
-//	i = 2;
-//	while (str[i])
-//	{
-//		i++;
-//	}
-//	converted = 0;
-//	return (converted);
-//}
-//
-//char	*convert_string_to_lower(char **str)
-//{
-//	int	i;
-//
-//	i = 2;
-//	while (str[i])
-//	{
-//		ft_tolower(str[i]);
-//		i++;
-//	}
-//	return (str);
-//}
+int	hex_to_dec(char *str)
+{
+	int		result;
+	int		i;
+	char	c;
+
+	result = 0;
+	i = 0;
+	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+		i = 2;
+	while (str[i])
+	{
+		c = ft_tolower(str[i]);
+		if (c >= '0' && c <= '9')
+			result = result * 16 + (c - '0');
+		else if (c >= 'a' && c <= 'f')
+			result = result * 16 + (c - 'a' + 10);
+		i++;
+	}
+	return (result);
+}
 
 void	free_all(char **array)
 {
@@ -44,4 +45,19 @@ void	free_all(char **array)
 		i++;
 	}
 	free(array);
+}
+
+void	free_map(t_map *map)
+{
+	int	i;
+
+	i = 0;
+	while (i < map->rows)
+	{
+		free(map->rows_array[i].array);
+		free(map->colors[i]);
+		i++;
+	}
+	free(map->rows_array);
+	free(map->colors);
 }
