@@ -6,7 +6,7 @@
 #    By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/09 08:56:45 by ryatan            #+#    #+#              #
-#    Updated: 2026/05/02 09:54:14 by ryatan           ###   ########.fr        #
+#    Updated: 2026/05/07 21:50:22 by ryatan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,6 +21,7 @@ SRC_DIR = src
 
 SRC = ../get_next_line/get_next_line.c \
 	  helpers.c \
+	  helpers2.c \
 	  rendering.c \
 	  parse_map_2d.c \
 	  parse_map_3d.c \

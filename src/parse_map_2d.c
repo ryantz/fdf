@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/22 11:38:09 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/06 20:06:53 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/07 21:40:22 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,33 +14,25 @@
 
 t_outer_array	*init_outer(t_outer_array *outer);
 t_outer_array	*create_array(char *map_file_path, t_outer_array *outer);
-char			**process_map(char *map_file_path, t_outer_array *outer);
+int				process_map(char *map_file_path, t_outer_array *outer);
 
-void	print_parsed_map(char **map, t_outer_array *outer)
+int	parse_map_2d(char *map_file_path, t_outer_array *outer)
 {
-	int	i;
-
-	i = 0;
-	while (i < outer->line_count)
-	{
-		ft_printf("line %d: %s\n", i + 1, map[i]);
-		i++;
-	}
-}
-
-char	**parse_map_2d(char *map_file_path, t_outer_array *outer)
-{
-	char	**array;
-
 	init_outer(outer);
 	create_array(map_file_path, outer);
-	array = process_map(map_file_path, outer);
-	print_parsed_map(array, outer);
-	return (array);
+	if (!outer->outer_array)
+		return (0);
+	if(process_map(map_file_path, outer) < 0)
+	{
+		free(outer->outer_array);
+		outer->outer_array = NULL;
+		return (0);
+	}
+	return (1);
 }
 
 // calloc used here for 2d array
-char	**process_map(char *map_file_path, t_outer_array *outer)
+int	process_map(char *map_file_path, t_outer_array *outer)
 {
 	int		fd;
 	int		line_len;
@@ -49,23 +41,25 @@ char	**process_map(char *map_file_path, t_outer_array *outer)
 
 	fd = open(map_file_path, O_RDONLY);
 	if (fd < 0)
-		return (NULL);
+		return (-1);
 	i = 0;
-	while (i < outer->line_count)
+	line = get_next_line(fd);
+	while (line && (i < outer->line_count))
 	{
-		line = get_next_line(fd);
-		if (line == NULL)
-			break ;
-		else
+		line_len = ft_strlen(line) - (line[ft_strlen(line) - 1] == '\n');
+		if (line_len == 0)
 		{
-			line_len = ft_strlen(line) - (line[ft_strlen(line) - 1] == '\n');
-			(outer->outer_array)[i] = ft_calloc(line_len + 1, sizeof(char));
-			ft_memcpy((outer->outer_array)[i], line, line_len);
 			free(line);
+			line = get_next_line(fd);
+			continue;
 		}
+		(outer->outer_array)[i] = ft_calloc(line_len + 1, sizeof(char));
+		ft_memcpy((outer->outer_array)[i], line, line_len);
+		free(line);
+		line = get_next_line(fd);
 		i++;
 	}
-	return (close(fd), outer->outer_array);
+	return (close(fd), 0);
 }
 
 t_outer_array	*create_array(char *map_file_path, t_outer_array *outer)
@@ -88,8 +82,7 @@ t_outer_array	*create_array(char *map_file_path, t_outer_array *outer)
 		}
 	}
 	close(fd);
-	outer->outer_array = malloc((outer->line_count + 1) * sizeof(char *));
-	outer->outer_array[outer->line_count] = NULL;
+	outer->outer_array = ft_calloc((outer->line_count + 1), sizeof(char *));
 	return (outer);
 }
 

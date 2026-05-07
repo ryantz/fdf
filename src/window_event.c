@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/06 20:00:51 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/06 20:47:20 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/07 19:45:54 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,13 @@ t_win_data	init_win_data(void)
 	return (w_data);
 }
 
+int	key_handler(int keycode, t_fdf *fdf)
+{
+	if (keycode == 65307)
+		window_close_handler(fdf);
+	return (0);
+}
+
 int	window_close_handler(t_fdf *fdf)
 {
 	free_map(fdf->map);
@@ -65,6 +72,7 @@ int	window_close_handler(t_fdf *fdf)
 
 void	window_loop(t_win_data *w_data, t_fdf *fdf)
 {
+	mlx_hook(w_data->win, 2, 1L << 0, key_handler, fdf);
 	mlx_hook(w_data->win, 17, 0, window_close_handler, fdf);
 	mlx_loop(w_data->mlx);
 }

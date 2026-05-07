@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/06 20:00:59 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/06 20:40:49 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/07 21:46:22 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,39 @@ void	free_map(t_map *map)
 	i = 0;
 	while (i < map->rows)
 	{
-		free(map->rows_array[i].array);
-		free(map->colors[i]);
+		if (map->rows_array && map->rows_array[i].array)
+			free(map->rows_array[i].array);
+		if (map->colors && map->colors[i])
+			free(map->colors[i]);
 		i++;
 	}
 	free(map->rows_array);
 	free(map->colors);
+}
+
+int	count_rows(char **outer_array)
+{
+	int	rows;
+
+	rows = 0;
+	while (outer_array[rows])
+		rows++;
+	return (rows);
+}
+
+int	fill_rows(char **outer_array, t_map *map)
+{
+	int	i;
+
+	i = 0;
+	while (i < map->rows)
+	{
+		if (!split_rows(outer_array[i], &(map->rows_array)[i],
+					&(map->colors)[i]))
+			return (map->rows = i, free_map(map), 0);
+		if (i > 0 && map->rows_array[i].count != map->rows_array[0].count)
+			return (map->rows = i + 1, free_map(map), 0);
+		i++;
+	}
+	return (1);
 }

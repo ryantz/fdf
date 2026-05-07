@@ -5,16 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/04/21 11:49:52 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/06 20:47:28 by ryatan           ###   ########.fr       */
+/*   Created: 2026/05/07 21:09:29 by ryatan            #+#    #+#             */
+/*   Updated: 2026/05/07 21:54:57 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
 
-# define HOME_PATH "/home/ryantz/dev/42/fdf/test_maps/" 
-# define PATH "/home/ryatan/core/fdf_home/test_maps/"
 # define WHITE 0xFFFFFF
 # define RED 0xFF0000
 
@@ -94,7 +92,7 @@ int			split_rows(char *outer_array_row, t_int_array *z_array,
 t_win_data	init_win_data(void);
 int			window_close_handler(t_fdf *fdf);
 void		window_loop(t_win_data *w_data, t_fdf *fdf);
-char		**parse_map_2d(char *map_file_path, t_outer_array *outer);
+int			parse_map_2d(char *map_file_path, t_outer_array *outer);
 
 void		render_iso(t_win_data *w, t_map *map);
 void		bresenham(t_win_data *w, t_point p0, t_point p1, int color);
@@ -103,5 +101,11 @@ int			hex_to_dec(char *str);
 void		put_pixel(t_win_data *w_data, int x, int y, int color);
 void		compute_scale(t_map *map, t_win_data *w);
 void		find_z_range(t_map *map, int *z_min, int *z_max);
+int			key_handler(int keycode, t_fdf *fdf);
+int			fill_rows(char **outer_array, t_map *map);
+int			count_rows(char **outer_array);
+int			fill_arrays(char **split_array, int n, t_int_array *z_array,
+				int **colors_row);
+int			parse_color(char *token);
 
 #endif
