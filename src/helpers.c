@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/06 20:00:59 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/07 21:46:22 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/08 10:02:02 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ int	fill_rows(char **outer_array, t_map *map)
 	while (i < map->rows)
 	{
 		if (!split_rows(outer_array[i], &(map->rows_array)[i],
-					&(map->colors)[i]))
+			&(map->colors)[i]))
 			return (map->rows = i, free_map(map), 0);
 		if (i > 0 && map->rows_array[i].count != map->rows_array[0].count)
 			return (map->rows = i + 1, free_map(map), 0);

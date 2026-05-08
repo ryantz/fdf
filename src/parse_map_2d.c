@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/22 11:38:09 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/07 21:40:22 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/08 10:05:26 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 t_outer_array	*init_outer(t_outer_array *outer);
 t_outer_array	*create_array(char *map_file_path, t_outer_array *outer);
 int				process_map(char *map_file_path, t_outer_array *outer);
+void			drain_gnl(int fd, char *line);
 
 int	parse_map_2d(char *map_file_path, t_outer_array *outer)
 {
@@ -22,9 +23,9 @@ int	parse_map_2d(char *map_file_path, t_outer_array *outer)
 	create_array(map_file_path, outer);
 	if (!outer->outer_array)
 		return (0);
-	if(process_map(map_file_path, outer) < 0)
+	if (process_map(map_file_path, outer) < 0)
 	{
-		free(outer->outer_array);
+		free_all(outer->outer_array);
 		outer->outer_array = NULL;
 		return (0);
 	}
@@ -47,19 +48,26 @@ int	process_map(char *map_file_path, t_outer_array *outer)
 	while (line && (i < outer->line_count))
 	{
 		line_len = ft_strlen(line) - (line[ft_strlen(line) - 1] == '\n');
-		if (line_len == 0)
+		if (line_len > 0)
 		{
-			free(line);
-			line = get_next_line(fd);
-			continue;
+			(outer->outer_array)[i] = ft_calloc(line_len + 1, sizeof(char));
+			ft_memcpy((outer->outer_array)[i], line, line_len);
 		}
-		(outer->outer_array)[i] = ft_calloc(line_len + 1, sizeof(char));
-		ft_memcpy((outer->outer_array)[i], line, line_len);
 		free(line);
 		line = get_next_line(fd);
 		i++;
 	}
+	drain_gnl(fd, line);
 	return (close(fd), 0);
+}
+
+void	drain_gnl(int fd, char *line)
+{
+	while (line)
+	{
+		free(line);
+		line = get_next_line(fd);
+	}
 }
 
 t_outer_array	*create_array(char *map_file_path, t_outer_array *outer)
@@ -75,11 +83,9 @@ t_outer_array	*create_array(char *map_file_path, t_outer_array *outer)
 		line = get_next_line(fd);
 		if (line == NULL)
 			break ;
-		else
-		{
+		if (ft_strlen(line) > 1 || (ft_strlen(line) == 1 && line[0] != '\n'))
 			outer->line_count++;
-			free(line);
-		}
+		free(line);
 	}
 	close(fd);
 	outer->outer_array = ft_calloc((outer->line_count + 1), sizeof(char *));

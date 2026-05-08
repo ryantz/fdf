@@ -17,13 +17,19 @@ The program supports per-vertex color encoding directly in the `.fdf` file (e.g.
 ```
 main()
   │
+  ├─ error_checks()          // Validate argc, check file exists and is readable
+  │
   ├─ parse_map_2d()          // Read the .fdf file line-by-line with get_next_line()
   │    ├─ init_outer()       // Zero-initialise the outer array struct
-  │    ├─ create_array()     // First pass: count lines, malloc outer_array
+  │    ├─ create_array()     // First pass: count non-blank lines, calloc outer_array
   │    └─ process_map()      // Second pass: copy each line (strip trailing \n)
+  │         └─ drain_gnl()   // Flush any remaining GNL static buffer after reading
   │
   ├─ parse_map_3d()          // Convert raw strings into integer z-values + colors
-  │    └─ split_rows()       // ft_split each row on ' ', atoi z, parse_color hex
+  │    ├─ count_rows()       // Count NULL-terminated outer_array entries
+  │    └─ fill_rows()        // Call split_rows for each row, validate column count
+  │         └─ split_rows()  // ft_split each row on ' ', atoi z, parse_color hex
+  │              └─ fill_arrays() // Populate z and color arrays from split tokens
   │
   ├─ free_all()              // Release the intermediate string array
   │
@@ -50,25 +56,44 @@ main()
 ### `main.c`
 | Function | Description |
 |----------|-------------|
-| `main(argc, argv)` | Entry point. Orchestrates parsing → window init → scale computation → rendering → event loop. |
+| `main(argc, argv)` | Entry point. Runs error checks, orchestrates parsing → window init → scale computation → rendering → event loop. |
+
+### `errors.c`
+| Function | Description |
+|----------|-------------|
+| `error_checks(argc, argv)` | Validates argument count, checks the file exists with `access(F_OK)`, and checks read permission with `access(R_OK)`. Prints an appropriate message and returns 1 on any failure. |
+| `print_error(err)` | Writes a human-readable error message to stderr using the `e_error` enum values (`WRONG_ARGS`, `WRONG_MAP_FORMAT`, `NO_FILE`, `NO_PERMISSIONS`). |
 
 ### `parse_map_2d.c`
 | Function | Description |
 |----------|-------------|
-| `parse_map_2d(path, outer)` | Top-level 2D parser. Calls init, create, and process in sequence. Returns the filled `outer_array`. |
+| `parse_map_2d(path, outer)` | Top-level 2D parser. Calls init, create, and process in sequence. Returns 1 on success, 0 on failure. |
 | `init_outer(outer)` | Zeroes out the `t_outer_array` struct before use. |
-| `create_array(path, outer)` | First file pass: counts lines with `get_next_line`, then `malloc`s the pointer array with a NULL sentinel. |
-| `process_map(path, outer)` | Second file pass: reads each line again, strips the trailing `\n`, and copies it into the pre-allocated slots with `ft_calloc` + `ft_memcpy`. |
-| `print_parsed_map(map, outer)` | Debug helper — prints every raw line to stdout (can be removed before submission). |
+| `create_array(path, outer)` | First file pass: counts non-blank lines with `get_next_line`, then `calloc`s the pointer array with a NULL sentinel. |
+| `process_map(path, outer)` | Second file pass: reads each line, skips blank lines, strips the trailing `\n`, and copies into pre-allocated slots with `ft_calloc` + `ft_memcpy`. Calls `drain_gnl` after the loop to flush GNL's static buffer. |
+| `drain_gnl(fd, line)` | Frees and reads remaining lines from a file descriptor until GNL returns NULL, preventing static buffer leaks. |
 
 ### `parse_map_3d.c`
 | Function | Description |
 |----------|-------------|
-| `parse_map_3d(outer_array, map)` | Counts rows from the NULL-terminated array, allocates `rows_array` and `colors`, then calls `split_rows` for each row. Sets `map->cols` from the first row's element count. |
-| `split_rows(row_str, z_array, colors_row)` | Splits a space-separated string with `ft_split`. For each token: `ft_atoi` gives the z value, `parse_color` extracts an optional hex color. |
+| `parse_map_3d(outer_array, map)` | Counts rows, guards against a 0-row map, allocates `rows_array` and `colors`, then calls `fill_rows`. Sets `map->cols` from the first row's element count. |
+| `split_rows(row_str, z_array, colors_row)` | Splits a space-separated string with `ft_split`. Allocates z and color arrays, then calls `fill_arrays` to populate them. |
 | `parse_color(token)` | Looks for a comma in the token (e.g. `5,0xFF8800`). If found, passes the substring after the comma to `hex_to_dec`; otherwise returns `-1` (use default color). |
-| `compute_scale(map, w)` | Computes a uniform integer scale so the projected map fits within the window dimensions, then sets `offset_x`/`offset_y` to center it. |
-| `find_z_range(map, z_min, z_max)` | Linear scan over all z values to establish the altitude range used by `compute_scale`. |
+| `compute_scale(map, w)` | Guards against 0-dimension maps, computes a uniform integer scale so the projected map fits within the window, then sets `offset_x`/`offset_y` to center it. |
+
+### `helpers.c`
+| Function | Description |
+|----------|-------------|
+| `hex_to_dec(str)` | Converts a hex string (with or without `0x`/`0X` prefix) to an integer. Supports uppercase and lowercase digits. |
+| `free_all(array)` | Iterates a NULL-terminated `char **`, frees each string, then frees the array pointer itself. |
+| `free_map(map)` | For each row, frees `rows_array[i].array` and `colors[i]` with NULL guards, then frees the top-level `rows_array` and `colors` pointers. |
+| `count_rows(outer_array)` | Returns the number of non-NULL entries in a NULL-terminated `char **`. |
+| `fill_rows(outer_array, map)` | Calls `split_rows` for each row. Returns 0 and cleans up if any row fails to parse or has a mismatched column count. |
+
+### `helpers2.c`
+| Function | Description |
+|----------|-------------|
+| `fill_arrays(split_array, n, z_array, colors_row)` | Iterates over `n` tokens, calling `ft_atoi` for z values and `parse_color` for colors, populating the pre-allocated arrays. |
 
 ### `rendering.c`
 | Function | Description |
@@ -83,17 +108,10 @@ main()
 | Function | Description |
 |----------|-------------|
 | `init_win_data()` | Creates the mlx connection, a 1280×900 window, an off-screen image of the same size, and retrieves the image's raw data address. |
-| `find_z_range(map, z_min, z_max)` | (Declared here, used in main) Scans the full map to set `*z_min` and `*z_max`. |
-| `key_handler(keycode, fdf)` | Receives all keypress events; currently maps ESC (keycode 65307) to `window_close_handler`. |
+| `find_z_range(map, z_min, z_max)` | Scans the full map to set `*z_min` and `*z_max`, used by `compute_scale` to account for altitude range. |
+| `key_handler(keycode, fdf)` | Receives all keypress events; maps ESC (keycode 65307) to `window_close_handler`. |
 | `window_close_handler(fdf)` | Frees map memory, destroys the image, window, and display, frees the mlx pointer, then calls `exit(0)`. |
 | `window_loop(w_data, fdf)` | Registers the keypress hook (event 2) and window-destroy hook (event 17), then enters `mlx_loop`. |
-
-### `helpers.c`
-| Function | Description |
-|----------|-------------|
-| `hex_to_dec(str)` | Converts a hex string (with or without `0x`/`0X` prefix) to an integer. Supports uppercase and lowercase digits. |
-| `free_all(array)` | Iterates a NULL-terminated `char **`, frees each string, then frees the array pointer itself. |
-| `free_map(map)` | For each row, frees `rows_array[i].array` and `colors[i]`, then frees the `rows_array` and `colors` top-level pointers. |
 
 ---
 
@@ -131,8 +149,6 @@ Press **ESC** or click the window's close button to exit cleanly.
 - [Bresenham's line algorithm — Wikipedia](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm)
 - [Isometric projection — Wikipedia](https://en.wikipedia.org/wiki/Isometric_projection)
 - [Isometric math explained (tileengines)](https://clintbellanger.net/articles/isometric_math/)
-- [42 Docs — FDF overview](https://harm-smits.github.io/42docs/projects/fdf)
-
 ### AI Usage
 Claude (Anthropic) was used during this project for the following tasks:
 - Explaining the mathematics behind the isometric projection formula and validating the `compute_scale` offset calculation.

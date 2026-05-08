@@ -6,7 +6,7 @@
 #    By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/09 08:56:45 by ryatan            #+#    #+#              #
-#    Updated: 2026/05/07 21:50:22 by ryatan           ###   ########.fr        #
+#    Updated: 2026/05/08 10:16:19 by ryatan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,7 @@ SRC = ../get_next_line/get_next_line.c \
 	  parse_map_2d.c \
 	  parse_map_3d.c \
 	  window_event.c \
+	  errors.c \
 	  main.c \
 
 OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
@@ -68,6 +69,7 @@ fclean: clean
 	rm -rf $(NAME)
 	$(MAKE) -C $(LIBFT_DIR) fclean
 	$(MAKE) -C $(PRINTF_DIR) fclean
+	$(MAKE) -C $(MLX_DIR) fclean
 
 re: fclean all
 

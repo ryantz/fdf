@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 21:09:29 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/07 21:54:57 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/08 09:54:58 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,14 @@
 # include "mlx.h"
 # include "mlx_int.h"
 # include "../get_next_line/get_next_line.h"
+
+enum e_error
+{
+	WRONG_ARGS,
+	WRONG_MAP_FORMAT,
+	NO_FILE,
+	NO_PERMISSIONS,
+};
 
 typedef struct s_win_data
 {
@@ -93,7 +101,6 @@ t_win_data	init_win_data(void);
 int			window_close_handler(t_fdf *fdf);
 void		window_loop(t_win_data *w_data, t_fdf *fdf);
 int			parse_map_2d(char *map_file_path, t_outer_array *outer);
-
 void		render_iso(t_win_data *w, t_map *map);
 void		bresenham(t_win_data *w, t_point p0, t_point p1, int color);
 t_point		project(int x, int y, int z, t_map *map);
@@ -107,5 +114,7 @@ int			count_rows(char **outer_array);
 int			fill_arrays(char **split_array, int n, t_int_array *z_array,
 				int **colors_row);
 int			parse_color(char *token);
+void		print_error(int err);
+int			error_checks(int argc, char **argv);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ryatan <ryatan@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/06 19:58:28 by ryatan            #+#    #+#             */
-/*   Updated: 2026/05/07 21:55:20 by ryatan           ###   ########.fr       */
+/*   Updated: 2026/05/08 09:32:21 by ryatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,9 @@ void	print_map_3d(t_map *map)
 
 int	parse_map_3d(char **outer_array, t_map *map)
 {
-	int	i;
-
-	i = 0;
 	map->rows = count_rows(outer_array);
+	if (map->rows == 0)
+		return (0);
 	map->rows_array = ft_calloc(map->rows, sizeof(t_int_array));
 	map->colors = ft_calloc(map->rows, sizeof(int *));
 	if (!map->rows_array || !map->colors)
@@ -80,8 +79,12 @@ void	compute_scale(t_map *map, t_win_data *w)
 	int	map_w;
 	int	map_h;
 
+	if (map->rows == 0 || map->cols == 0)
+		return ;
 	map_w = (map->cols + map->rows);
 	map_h = (map->cols + map->rows) / 2 + (map->z_max - map->z_min);
+	if (map_h == 0)
+		map_h = 1;
 	map->scale = w->win_w / map_w;
 	if (w->win_h / map_h < map->scale)
 		map->scale = w->win_h / map_h;
